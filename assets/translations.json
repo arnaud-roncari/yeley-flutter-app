@@ -1,0 +1,22 @@
+{
+    "security:establishment:not_found": {
+        "fr": "L'établissement n'a pas été trouvé.",
+        "en": "The establishment was not found."
+    },
+    "security:password:not_matching": {
+        "fr": "Le mot de passe ne correspond pas.",
+        "en": "The password does not match."
+    },
+    "security:user:exists": {
+        "fr": "Un utilisateur avec le même email existe déjà.",
+        "en": "A user with the same email already exists."
+    },
+    "security:user:not_found": {
+        "fr": "L'utilisateur n'a pas été trouvé.",
+        "en": "The user was not found."
+    },
+    "internal:generic": {
+        "fr": "Oups... Une erreur est survenue.",
+        "en": "Oops... An error has occurred."
+    }
+}

@@ -18,7 +18,7 @@ class Api {
     return jwt;
   }
 
-  Future<void> signup(
+  Future<String> signup(
     String email,
     String password,
   ) async {
@@ -36,13 +36,12 @@ class Api {
     );
 
     if (response.statusCode < 200 || response.statusCode > 299) {
-      return ExceptionHelper.fromResponse(response);
+      ExceptionHelper.fromResponse(response);
     }
-
-    await LocalStorageService().setString("JWT", jsonDecode(response.body)["accessToken"]);
+    return jsonDecode(response.body)["accessToken"];
   }
 
-  Future<void> login(
+  Future<String> login(
     String email,
     String password,
   ) async {
@@ -58,12 +57,25 @@ class Api {
         },
       ),
     );
-    // TODO Rendre p^lus sexy ces if avec un fonction is200StatusCode (ou autre)
+
+    if (response.statusCode < 200 || response.statusCode > 299) {
+      ExceptionHelper.fromResponse(response);
+    }
+    return jsonDecode(response.body)["accessToken"];
+  }
+
+  Future<void> deleteUserAccount() async {
+    String jwt = await Api.getJWT();
+
+    Response response = await delete(
+      Uri.parse('$kApiUrl/users'),
+      headers: {
+        'Authorization': 'Bearer $jwt',
+      },
+    );
     if (response.statusCode < 200 || response.statusCode > 299) {
       return ExceptionHelper.fromResponse(response);
     }
-
-    await LocalStorageService().setString("JWT", jsonDecode(response.body)["accessToken"]);
   }
 
   Api._internal();

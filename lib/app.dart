@@ -14,9 +14,7 @@ class YeleyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Yeley',
-      // TODO remettre la ternaire
-      initialRoute: "/signup",
-      // initialRoute: isSession ? "/home" : "/signup",
+      initialRoute: isSession ? "/home" : "/signup",
       routes: {
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignUpPage(),

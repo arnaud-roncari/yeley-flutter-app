@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:yeley_frontend/commons/decoration.dart';
 import 'package:yeley_frontend/services/local_storage.dart';
+import 'package:yeley_frontend/commons/extensions/translate.dart';
 
 abstract class ApiException implements Exception {
   final String message;
@@ -42,14 +43,21 @@ class Message extends ApiException {
 }
 
 class ExceptionHelper {
-  /// Throw exception [ApiException], from the Api Jobme service, based on status codes.
+  /// Throw exception [ApiException], from the Api service, based on status codes.
   static void fromResponse(Response response) {
     Map<String, dynamic> body = jsonDecode(response.body);
+    String? message;
+
+    // Translate the error message
+    if (body.containsKey('id')) {
+      message = (body["id"] as String).translate();
+    }
+
     switch (response.statusCode) {
       case 401:
         throw SessionExpired();
       default:
-        throw Message(body['message'] ?? 'Oups... Une erreur est survenue.');
+        throw Message(message ?? "internal:generic".translate());
     }
   }
 

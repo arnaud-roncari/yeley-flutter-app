@@ -22,6 +22,7 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: kScaffoldBackground,
         body: Form(
           key: _formKey,
           child: Column(
@@ -38,7 +39,7 @@ class _SignUpPageState extends State<SignUpPage> {
               const Align(
                 alignment: Alignment.center,
                 child: Text(
-                  "Inscris toi",
+                  "Inscrivez-vous",
                   style: kBold22,
                 ),
               ),
@@ -167,7 +168,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: SizedBox(
                   height: 50,
                   width: double.infinity,
-                  child: context.read<AuthProvider>().isRegistering
+                  child: context.watch<AuthProvider>().isRegistering
                       ? const Center(
                           child: CircularProgressIndicator(),
                         )
@@ -196,12 +197,12 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     children: [
                       TextSpan(
-                        text: 'Tu as déjà un compte ? ',
+                        text: 'Vous avez déjà un compte ? ',
                         style: kRegular16.copyWith(color: Colors.black),
                       ),
                       TextSpan(
                         style: kRegular16.copyWith(color: kMainGreen),
-                        text: 'Connectes toi.',
+                        text: 'Connectez-vous.',
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             Navigator.pushNamed(context, '/login');

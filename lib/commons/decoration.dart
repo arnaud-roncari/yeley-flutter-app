@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 const kMainGreen = Color.fromRGBO(76, 211, 164, 1);
+final kScaffoldBackground = Colors.grey[100];
 
 const TextStyle kRegular16 = TextStyle(
   fontFamily: "Lato",

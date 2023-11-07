@@ -10,6 +10,7 @@ class PrivacyPolicyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: kScaffoldBackground,
         appBar: AppBar(
           backgroundColor: kMainGreen,
           title: const Text('Politique de confidentialité'),
