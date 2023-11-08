@@ -35,7 +35,6 @@ void main() async {
   );
 }
 
-// - demander des versions plus clean des logos
 // - Mettre les textfield de geoloc puis -> Mettre en place la geoloce (charger celle du tel + rentrer un address)
 
 // - Splash screen

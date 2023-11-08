@@ -11,12 +11,36 @@ class PrivacyPolicyPage extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         backgroundColor: kScaffoldBackground,
-        appBar: AppBar(
-          backgroundColor: kMainGreen,
-          title: const Text('Politique de confidentialité'),
-        ),
-        body: SfPdfViewer.network(
-          "$kApiUrl/legalities/privacy-policy",
+        body: Column(
+          children: [
+            SizedBox(
+              height: 60,
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new,
+                      color: kMainGreen,
+                    ),
+                  ),
+                  const Spacer(),
+                  const Text(
+                    'Politique de confidentialité',
+                    style: kBold16,
+                  ),
+                  const Spacer()
+                ],
+              ),
+            ),
+            Expanded(
+              child: SfPdfViewer.network(
+                "$kApiUrl/legalities/privacy-policy",
+              ),
+            ),
+          ],
         ),
       ),
     );

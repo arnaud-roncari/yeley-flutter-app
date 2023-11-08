@@ -89,7 +89,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: TextFormField(
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
-                    hintText: 'mon.email@gmail.com',
+                    hintText: 'Entrer email',
+                    hintStyle: kRegular16,
                   ),
                   controller: _emailController,
                   validator: Validator.email,
@@ -107,7 +108,8 @@ class _SignUpPageState extends State<SignUpPage> {
                   obscureText: true,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
-                    hintText: '********',
+                    hintText: 'Entrer mot de passe',
+                    hintStyle: kRegular16,
                   ),
                   controller: _passwordController,
                   validator: Validator.password,

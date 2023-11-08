@@ -30,7 +30,7 @@ class Message extends ApiException {
   Future<void> handle(BuildContext context) async {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: kMainGreen,
+        backgroundColor: Colors.red,
         content: Text(
           message,
           style: kRegular16.copyWith(
@@ -67,7 +67,7 @@ class ExceptionHelper {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: kMainGreen,
+          backgroundColor: Colors.red,
           content: Text(
             '$exception',
             style: kRegular16.copyWith(

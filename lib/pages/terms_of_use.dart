@@ -11,12 +11,36 @@ class TermsOfUsePage extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         backgroundColor: kScaffoldBackground,
-        appBar: AppBar(
-          backgroundColor: kMainGreen,
-          title: const Text('Conditions générales d\'utilisation'),
-        ),
-        body: SfPdfViewer.network(
-          "$kApiUrl/legalities/terms-of-use",
+        body: Column(
+          children: [
+            SizedBox(
+              height: 60,
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new,
+                      color: kMainGreen,
+                    ),
+                  ),
+                  const Spacer(),
+                  const Text(
+                    'Conditions générales d\'utilisation',
+                    style: kBold16,
+                  ),
+                  const Spacer()
+                ],
+              ),
+            ),
+            Expanded(
+              child: SfPdfViewer.network(
+                "$kApiUrl/legalities/terms-of-use",
+              ),
+            ),
+          ],
         ),
       ),
     );

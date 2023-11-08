@@ -26,6 +26,10 @@ class _HomePageState extends State<HomePage> {
         isRestaurant = _switchController.value;
       });
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await context.read<UsersProvider>().getAddress();
+    });
   }
 
   Widget _buildTopBar() {
@@ -158,6 +162,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildSearchBar() {
+    final UsersProvider userProvider = context.watch<UsersProvider>();
     return Container(
       height: 70,
       // I can't use "double.infinity" here, since there is rows and inkwell as childs, their size depending of this container width.
@@ -194,7 +199,10 @@ class _HomePageState extends State<HomePage> {
                   topLeft: Radius.circular(15),
                   bottomLeft: Radius.circular(15),
                 ),
-                onTap: () {},
+                onTap: () async {
+                  Navigator.pushNamed(context, '/address-form');
+                  // TODO si adresse vide, demander au user de mettre une adresse
+                },
                 child: Padding(
                   padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15, top: 10),
                   child: Column(
@@ -203,7 +211,7 @@ class _HomePageState extends State<HomePage> {
                       Row(
                         children: [
                           Text(
-                            "Rue",
+                            "Adresse",
                             style: kRegular14.copyWith(color: Colors.grey),
                           ),
                           const Icon(
@@ -214,7 +222,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const Spacer(),
                       Text(
-                        "9 rue du mas de portal, Montpellier, 34970",
+                        userProvider.address == null ? "" : userProvider.address!.fullAddress,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: kRegular16.copyWith(color: Colors.black),
@@ -352,6 +360,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // TODO  afficher illustration si aucun etablishement returned
     return SafeArea(
         child: Scaffold(
       backgroundColor: kScaffoldBackground,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yeley_frontend/pages/address_form.dart';
 import 'package:yeley_frontend/pages/home.dart';
 import 'package:yeley_frontend/pages/login.dart';
 import 'package:yeley_frontend/pages/privacy_policy.dart';
@@ -21,6 +22,7 @@ class YeleyApp extends StatelessWidget {
         '/home': (context) => const HomePage(),
         '/terms-of-use': (context) => const TermsOfUsePage(),
         '/privacy-policy': (context) => const PrivacyPolicyPage(),
+        '/address-form': (context) => const AddressFormPage(),
       },
     );
   }
