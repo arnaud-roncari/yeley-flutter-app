@@ -22,6 +22,12 @@ const TextStyle kRegular14 = TextStyle(
   fontWeight: FontWeight.w500,
 );
 
+const TextStyle kBold14 = TextStyle(
+  fontFamily: "Lato",
+  fontSize: 14,
+  fontWeight: FontWeight.w700,
+);
+
 const TextStyle kRegular18 = TextStyle(
   fontFamily: "Lato",
   fontSize: 18,

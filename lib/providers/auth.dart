@@ -19,6 +19,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       String jwt = await Api().login(email, password);
       await LocalStorageService().setString("JWT", jwt);
+      Api.jwt = jwt;
       Navigator.pushNamedAndRemoveUntil(
         context,
         '/home',
@@ -42,6 +43,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       String jwt = await Api().signup(email, password);
       await LocalStorageService().setString("JWT", jwt);
+      Api.jwt = jwt;
       Navigator.pushNamedAndRemoveUntil(
         context,
         '/home',

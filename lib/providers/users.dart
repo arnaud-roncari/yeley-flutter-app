@@ -4,36 +4,81 @@ import 'package:geolocator/geolocator.dart';
 
 import 'package:geocoding/geocoding.dart';
 import 'package:flutter/material.dart';
+import 'package:yeley_frontend/commons/constants.dart';
 import 'package:yeley_frontend/commons/decoration.dart';
 import 'package:yeley_frontend/commons/exception.dart';
 import 'package:yeley_frontend/models/address.dart';
+import 'package:yeley_frontend/models/establishment.dart';
+import 'package:yeley_frontend/models/tag.dart';
 import 'package:yeley_frontend/services/api.dart';
 import 'package:yeley_frontend/services/local_storage.dart';
 
 class UsersProvider extends ChangeNotifier {
+  UsersProvider({
+    this.address,
+  });
+
   bool isDeleting = false;
   bool isSettingAddress = false;
+  bool isTagsLoading = false;
+  bool isNearbyEstablishmentsLoading = false;
+  bool isCardSwiped = false;
+
+  /// The current displayed page.
+  /// Default value is home.
+  BottomNavigation navigationIndex = BottomNavigation.home;
+
+  /// Establishent displayed depend on the type selected (restaurant/activity).
+  EstablishmentType establishmentType = EstablishmentType.restaurant;
+
+  /// User address
   Address? address;
 
-  Future<void> deleteAccount(
+  /// Range to get nearby establishments in a circle, expressed in KM.
+  /// Default value is 5.
+  int range = 5;
+
+  /// Tags from the database
+  List<Tag>? restaurantsTags;
+  List<Tag>? activitiesTags;
+
+  Future<void> onEstablishmentTypeSwitched(
+    BuildContext context,
+  ) async {
+    if (establishmentType == EstablishmentType.restaurant) {
+      establishmentType = EstablishmentType.activity;
+      displayedTags = activitiesTags;
+    } else {
+      establishmentType = EstablishmentType.restaurant;
+      displayedTags = restaurantsTags;
+    }
+    selectedTags = [];
+    notifyListeners();
+    await getNearbyEstablishments(context);
+  }
+
+  Future<void> getTags(
     BuildContext context,
   ) async {
     try {
-      isDeleting = true;
+      isTagsLoading = true;
       notifyListeners();
-      await Api().deleteUserAccount();
-      // JWT is removed.
-      await LocalStorageService().setString("JWT", "");
-      // The user is redirected on the signup page.
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/signup',
-        (Route<dynamic> route) => false,
-      );
+      final List<Tag> tags = await Api().getTags();
+
+      restaurantsTags = [];
+      activitiesTags = [];
+      for (Tag tag in tags) {
+        if (tag.type == EstablishmentType.restaurant) {
+          restaurantsTags!.add(tag);
+        } else {
+          activitiesTags!.add(tag);
+        }
+      }
+      displayedTags = restaurantsTags;
     } catch (exception) {
       await ExceptionHelper.handle(context: context, exception: exception);
     } finally {
-      isDeleting = false;
+      isTagsLoading = false;
       notifyListeners();
     }
   }
@@ -43,24 +88,13 @@ class UsersProvider extends ChangeNotifier {
   ) async {
     // JWT is removed.
     await LocalStorageService().setString("JWT", "");
+    Api.jwt = null;
     // The user is redirected on the signup page.
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/signup',
       (Route<dynamic> route) => false,
     );
-  }
-
-  Future<void> getAddress() async {
-    final String? stringifyJson = await LocalStorageService().getString("address");
-
-    if (stringifyJson == null) {
-      return;
-    }
-
-    final Map<String, dynamic> json = jsonDecode(stringifyJson);
-    address = Address.fromJson(json);
-    notifyListeners();
   }
 
   // Address will be saved in the secure storage.
@@ -170,6 +204,210 @@ class UsersProvider extends ChangeNotifier {
       isSettingAddress = false;
       notifyListeners();
       Navigator.pop(context);
+    }
+  }
+
+  Future<void> onBottomNavigationUpdated(BuildContext context) async {
+    if (navigationIndex == BottomNavigation.home) {
+      navigationIndex = BottomNavigation.favorites;
+      notifyListeners();
+      await getNearbyFavoriteEstablishments(context);
+    } else {
+      navigationIndex = BottomNavigation.home;
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteAccount(
+    BuildContext context,
+  ) async {
+    try {
+      isDeleting = true;
+      notifyListeners();
+      await Api().deleteUserAccount();
+      // JWT is removed.
+      await LocalStorageService().setString("JWT", "");
+      // The user is redirected on the signup page.
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/signup',
+        (Route<dynamic> route) => false,
+      );
+    } catch (exception) {
+      await ExceptionHelper.handle(context: context, exception: exception);
+    } finally {
+      isDeleting = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> onRangeUpdated(BuildContext context, int newRange) async {
+    range = newRange;
+    notifyListeners();
+
+    if (navigationIndex == BottomNavigation.home) {
+      await getNearbyEstablishments(context);
+    } else {
+      await getNearbyFavoriteEstablishments(context);
+    }
+  }
+
+  /// --- Home ---
+
+  /// The selected tags, default restaurant ones.
+  List<Tag>? displayedTags;
+
+  /// Tags selected by the user.
+  List<Tag> selectedTags = [];
+
+  /// Displayed establishment
+  List<Establishment>? displayedEstablishments;
+
+  /// Use for the front card animation
+  Offset frontCardPosition = Offset.zero;
+
+  /// Define int the init state.
+  /// Used for the front card animation
+  Size screenSize = Size.zero;
+
+  Future<void> onCardSwiped(
+    BuildContext context,
+    EstablishmentSwiped status,
+  ) async {
+    /// Used for the animation time.
+    isCardSwiped = true;
+
+    /// Set the end position of the animation.
+    frontCardPosition += status == EstablishmentSwiped.liked
+        ? Offset(2 * screenSize.width, 2 * screenSize.width)
+        : Offset(-2 * screenSize.width, 2 * screenSize.width);
+    notifyListeners();
+
+    if (status == EstablishmentSwiped.liked) {
+      await Api().like(displayedEstablishments!.first);
+    } else {
+      await Api().unlike(displayedEstablishments!.first);
+    }
+
+    /// Wait for the animation to ten.
+    await Future.delayed(const Duration(milliseconds: 200));
+
+    displayedEstablishments!.removeAt(0);
+
+    /// Reset the position for the next card.
+    frontCardPosition = Offset.zero;
+    isCardSwiped = false;
+    notifyListeners();
+  }
+
+  Future<void> onHomeTagTap(BuildContext context, Tag tag, bool isSelected) async {
+    if (isSelected) {
+      selectedTags.add(tag);
+    } else {
+      selectedTags.remove(tag);
+    }
+    notifyListeners();
+    await getNearbyEstablishments(context);
+  }
+
+  Future<void> getNearbyEstablishments(
+    BuildContext context,
+  ) async {
+    try {
+      // Since the function is call during the init state, the address might be null at this moment (if first time using app).
+      if (address == null) {
+        return;
+      }
+      isNearbyEstablishmentsLoading = true;
+      notifyListeners();
+      displayedEstablishments = await Api().getNearbyEstablishments(
+        range,
+        address!.coordinates,
+        establishmentType,
+        selectedTags,
+      );
+    } catch (exception) {
+      await ExceptionHelper.handle(context: context, exception: exception);
+    } finally {
+      isNearbyEstablishmentsLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// --- Favorites ---
+  bool isNearbyFavoriteLoading = false;
+
+  /// Selected tags
+  List<Tag> favoriteSelectedRestaurantsTags = [];
+  List<Tag> favoriteSelectedActivitiesTags = [];
+
+  List<Establishment>? favoriteRestaurants;
+  List<Establishment>? favoriteActivities;
+
+  /// Prevent error displayed "not favorites" if you select a tag and the search return a empty list.
+  bool hasInitialyFavorites = false;
+
+  bool isFavoritesNull() {
+    return favoriteRestaurants == null && favoriteActivities == null;
+  }
+
+  bool isFavoritesEmpty() {
+    if (hasInitialyFavorites) {
+      return false;
+    }
+
+    return favoriteRestaurants!.isEmpty && favoriteActivities!.isEmpty;
+  }
+
+  Future<void> onFavoriteTagTap(BuildContext context, Tag tag, bool isSelected) async {
+    if (isSelected) {
+      if (tag.type == EstablishmentType.restaurant) {
+        favoriteSelectedRestaurantsTags.add(tag);
+      } else {
+        favoriteSelectedActivitiesTags.add(tag);
+      }
+    } else {
+      if (tag.type == EstablishmentType.restaurant) {
+        favoriteSelectedRestaurantsTags.remove(tag);
+      } else {
+        favoriteSelectedActivitiesTags.remove(tag);
+      }
+    }
+    notifyListeners();
+    await getNearbyFavoriteEstablishments(context);
+  }
+
+  Future<void> getNearbyFavoriteEstablishments(context) async {
+    try {
+      if (address == null) {
+        return;
+      }
+      isNearbyFavoriteLoading = true;
+      notifyListeners();
+      favoriteRestaurants = await Api().getNearbyEstablishments(
+        range,
+        address!.coordinates,
+        EstablishmentType.restaurant,
+        favoriteSelectedRestaurantsTags,
+        favorite: true,
+      );
+      favoriteActivities = await Api().getNearbyEstablishments(
+        range,
+        address!.coordinates,
+        EstablishmentType.activity,
+        favoriteSelectedActivitiesTags,
+        favorite: true,
+      );
+
+      /// Will mainly set the first time the user arrive on the favorite page.
+      if (favoriteActivities!.isNotEmpty || favoriteRestaurants!.isNotEmpty) {
+        hasInitialyFavorites = true;
+      }
+    } catch (exception) {
+      await ExceptionHelper.handle(context: context, exception: exception);
+    } finally {
+      isNearbyFavoriteLoading = false;
+      notifyListeners();
     }
   }
 }

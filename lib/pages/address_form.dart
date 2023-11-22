@@ -11,15 +11,6 @@ class AddressFormPage extends StatefulWidget {
   State<AddressFormPage> createState() => _AddressFormPageState();
 }
 
-// si une addresse est définie, elle doit être sauvegardée dans le storage.
-// au moment de l'ouverture de l'app, l'adresse sera chargé., permettant de faire requête pour récupérer
-// les restaurant dans home, dans le init state.
-
-// Définir ma position à l'aide de la géolocalisation du téléphone (button)
-
-// code postal, ville
-// adresse, numéro
-
 class _AddressFormPageState extends State<AddressFormPage> {
   final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
@@ -30,6 +21,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: kScaffoldBackground,
         body: Form(
           key: _formKey,
@@ -50,7 +42,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
                     ),
                     const SizedBox(width: 30),
                     const Text(
-                      'Nouvelle adresse',
+                      'Mon adresse',
                       style: kBold18,
                     ),
                   ],
@@ -102,7 +94,10 @@ class _AddressFormPageState extends State<AddressFormPage> {
               ),
               const Spacer(),
               context.watch<UsersProvider>().isSettingAddress
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                      color: kMainGreen,
+                    ))
                   : Column(
                       children: [
                         Padding(

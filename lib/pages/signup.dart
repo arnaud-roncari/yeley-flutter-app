@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:yeley_frontend/commons/decoration.dart';
 import 'package:yeley_frontend/commons/validators.dart';
@@ -22,6 +23,7 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: kScaffoldBackground,
         body: Form(
           key: _formKey,
@@ -31,8 +33,10 @@ class _SignUpPageState extends State<SignUpPage> {
               const Spacer(),
               Align(
                 alignment: Alignment.center,
-                child: Image.asset(
-                  'assets/yeley_logo_95.png',
+                child: SvgPicture.asset(
+                  'assets/yeley.svg',
+                  height: 95,
+                  width: 95,
                 ),
               ),
               const SizedBox(height: 30),
@@ -172,7 +176,9 @@ class _SignUpPageState extends State<SignUpPage> {
                   width: double.infinity,
                   child: context.watch<AuthProvider>().isRegistering
                       ? const Center(
-                          child: CircularProgressIndicator(),
+                          child: CircularProgressIndicator(
+                            color: kMainGreen,
+                          ),
                         )
                       : ElevatedButton(
                           style: ElevatedButton.styleFrom(backgroundColor: kMainGreen),
