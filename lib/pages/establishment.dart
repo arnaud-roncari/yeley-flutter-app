@@ -185,7 +185,6 @@ class _EstablishmentPageState extends State<EstablishmentPage> {
                       style: ElevatedButton.styleFrom(
                           backgroundColor: kMainGreen, shape: const StadiumBorder(), shadowColor: Colors.transparent),
                       onPressed: () async {
-                        // TODO tester sur un vrai téléphone
                         final Uri url = Uri.parse('tel:${widget.establishment.phone}');
 
                         if (!await launchUrl(url)) {
@@ -196,7 +195,10 @@ class _EstablishmentPageState extends State<EstablishmentPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const SizedBox(width: 5),
-                          const Icon(CupertinoIcons.phone_arrow_up_right),
+                          const Icon(
+                            CupertinoIcons.phone_arrow_up_right,
+                            color: Colors.white,
+                          ),
                           const SizedBox(width: 10),
                           Text(
                             "Appeler",

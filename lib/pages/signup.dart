@@ -191,7 +191,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   }
                                 }
                               : null,
-                          child: const Text("S'inscrire", style: kBold16),
+                          child: Text("S'inscrire", style: kBold16.copyWith(color: Colors.white)),
                         ),
                 ),
               ),

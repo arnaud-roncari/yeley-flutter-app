@@ -106,13 +106,13 @@ class _AddressFormPageState extends State<AddressFormPage> {
                             height: 50,
                             width: double.infinity,
                             child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(backgroundColor: kMainBlue),
+                              style: ElevatedButton.styleFrom(backgroundColor: kMainBlue, shape: const StadiumBorder()),
                               onPressed: () async {
                                 await context.read<UsersProvider>().getPhonePosition(context);
                               },
-                              child: const Text(
+                              child: Text(
                                 "Ma position",
-                                style: kBold16,
+                                style: kBold16.copyWith(color: Colors.white),
                               ),
                             ),
                           ),
@@ -124,7 +124,8 @@ class _AddressFormPageState extends State<AddressFormPage> {
                             height: 50,
                             width: double.infinity,
                             child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(backgroundColor: kMainGreen),
+                              style:
+                                  ElevatedButton.styleFrom(backgroundColor: kMainGreen, shape: const StadiumBorder()),
                               onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
                                   await context.read<UsersProvider>().setAddress(
@@ -135,7 +136,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
                                       );
                                 }
                               },
-                              child: const Text("Valider", style: kBold16),
+                              child: Text("Valider", style: kBold16.copyWith(color: Colors.white)),
                             ),
                           ),
                         ),

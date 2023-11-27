@@ -51,13 +51,3 @@ void main() async {
     ),
   );
 }
-
-// - Mettre les textfield de geoloc puis -> Mettre en place la geoloce (charger celle du tel + rentrer un address)
-
-// - Splash screen
-// - Charger 10 images par 10 (cache ?)
-// - tester sur véritable iphone (besoin d'un compte dev ?)
-// - accéder à la geoloc du téléphone
-// - demander les accès aux logo/droits au figma
-
-

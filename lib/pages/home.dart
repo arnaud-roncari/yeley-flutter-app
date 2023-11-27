@@ -60,6 +60,52 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text(
+            'Êtes-vous sûr ?',
+            style: kBold22.copyWith(color: Colors.black),
+          ),
+          content: Text(
+            'Votre compte sera supprimé définitivement.',
+            style: kRegular16.copyWith(color: Colors.black),
+          ),
+          actions: context.watch<UsersProvider>().isDeleting
+              ? [
+                  const Center(
+                      child: CircularProgressIndicator(
+                    color: kMainGreen,
+                  ))
+                ]
+              : <Widget>[
+                  TextButton(
+                    child: Text(
+                      'Supprimer',
+                      style: kRegular16.copyWith(color: Colors.red),
+                    ),
+                    onPressed: () async {
+                      await context.read<UsersProvider>().deleteAccount(context);
+                    },
+                  ),
+                  TextButton(
+                    child: Text(
+                      'Annuler',
+                      style: kRegular16.copyWith(color: Colors.black),
+                    ),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+        );
+      },
+    );
+  }
+
   Widget _buildTopBar() {
     return SizedBox(
       height: 60,
@@ -148,6 +194,7 @@ class _HomePageState extends State<HomePage> {
             ),
           const Spacer(),
           PopupMenuButton<void>(
+            color: Colors.white,
             itemBuilder: (BuildContext context) => <PopupMenuEntry<void>>[
               PopupMenuItem<void>(
                 child: const Text(
@@ -182,7 +229,7 @@ class _HomePageState extends State<HomePage> {
                   style: kRegular16.copyWith(color: Colors.red),
                 ),
                 onTap: () async {
-                  await context.read<UsersProvider>().deleteAccount(context);
+                  _showMyDialog();
                 },
               ),
             ],
@@ -245,7 +292,7 @@ class _HomePageState extends State<HomePage> {
                   }
                 },
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15, top: 10),
+                  padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -370,7 +417,7 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15, top: 10),
+                  padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -535,9 +582,9 @@ class _HomePageState extends State<HomePage> {
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: kMainGreen, shape: const StadiumBorder()),
-            child: const Text(
+            child: Text(
               "Définir mon adresse",
-              style: kBold16,
+              style: kBold16.copyWith(color: Colors.white),
             ),
           ),
         ],
@@ -909,6 +956,7 @@ class _HomePageState extends State<HomePage> {
                                     alignment: Alignment.bottomLeft,
                                     child: Text(
                                       provider.favoriteRestaurants![index].name,
+                                      overflow: TextOverflow.ellipsis,
                                       style: kRegular18.copyWith(color: Colors.white),
                                     ),
                                   ),
@@ -963,26 +1011,58 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               );
                             },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.3),
-                                    spreadRadius: 3,
-                                    blurRadius: 3,
-                                    offset: const Offset(0, 0),
+                            child: Stack(
+                              children: [
+                                Container(
+                                  foregroundDecoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Colors.transparent,
+                                        Colors.transparent,
+                                        Colors.black,
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      stops: [
+                                        0,
+                                        0.2,
+                                        1,
+                                      ],
+                                    ),
                                   ),
-                                ],
-                                image: DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: CachedNetworkImageProvider(
-                                      "$kApiUrl/establishments/picture/${provider.favoriteActivities![index].picturesPaths[0]}",
-                                      headers: {
-                                        'Authorization': 'Bearer ${Api.jwt}',
-                                      }),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.5),
+                                        spreadRadius: 1,
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 1),
+                                      ),
+                                    ],
+                                    image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: CachedNetworkImageProvider(
+                                          "$kApiUrl/establishments/picture/${provider.favoriteActivities![index].picturesPaths[0]}",
+                                          headers: {
+                                            'Authorization': 'Bearer ${Api.jwt}',
+                                          }),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Align(
+                                    alignment: Alignment.bottomLeft,
+                                    child: Text(
+                                      provider.favoriteActivities![index].name,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: kRegular18.copyWith(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         );
@@ -995,26 +1075,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /// TODO Arrondir les boutons de la geoloc
-
-  /// Installer git et récupérer le code
-
-  /// Lancer l'application mobile sur:
-  /// - iOS
-  /// - Android (tester l'icon de l'app, le responsive sur un petit téléphone)
-  ///
-  /// Définir la production
-  /// - Acheter le comtpe développeur Android
-  ///
-  ///
-  /// - SSL (Certbot)
-  /// - NGINX (redirection port 80 -> 8080)
-  /// - Docker (NestJS, MinIO)
-
-  /// TODO est-ce qu'on doita voir une société pour sortir l'app
-
-  /// TODO Design pour les stores
-  /// TODO Partie juridique (ccg, pc)
+  /// TODO Mise en productio, iOS -> documents légaux / site support
+  /// TODO Mise en production android -> vérification identité / documents légaux / site support / tests fermés (20 testeurs) pendant 14 jours
+  /// Vérifier la DB avant de soumettre
+  /// Mettre les documents légaux sur MinIO
 
   /// TODO plus tard, changer les info du compte
   /// Android (téléphone)
@@ -1027,14 +1091,18 @@ class _HomePageState extends State<HomePage> {
   /// mdp vps: wPqBksp9n7xm
   /// user vps: ubuntu
   /// ip vps: 37.187.45.202
-  /// Yyeley245@!
+  /// mot de passe gmail Yyeley245@!
   ///
-  /// Installer git, récupérer le clde
+  /// Mobile apple app SKU: fb7516b3-5aa4-4547-86cd-d8208e459990
   ///
-  ///
+  /// pour android=
+  /// storePassword=6aBc3bpUU^H3kmvo2xnnMpa*sjxv#sc
+  /// keyPassword=6aBc3bpUU^H3kmvo2xnnMpa*sjxv#sc
+  /// envoyer la keystore par mail
+
   /// Remove la connection de ma clés ssh
   /// Mette le code sur un github au nom de l'email
-  ///
+  /// Update l(env pour retrier les donnée sensible (url de db))
 
   @override
   Widget build(BuildContext context) {

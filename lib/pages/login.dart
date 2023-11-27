@@ -139,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                                   .login(context, _emailController.text, _emailController.text);
                             }
                           },
-                          child: const Text("Se connecter", style: kBold16),
+                          child: Text("Se connecter", style: kBold16.copyWith(color: Colors.white)),
                         ),
                 ),
               ),

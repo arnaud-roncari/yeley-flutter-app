@@ -128,29 +128,32 @@ class _EstablishmentCardState extends State<EstablishmentCard> {
               ],
             ),
             const SizedBox(height: 15),
-            Row(
-              children: widget.establishment.tags.map((e) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 5),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                          color: kMainGreen,
-                        ),
-                        borderRadius: BorderRadius.circular(100),
-                        color: kMainGreen.withOpacity(0.1)),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      child: Text(
-                        e.value,
-                        style: kBold14.copyWith(
-                          color: kMainGreen,
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: widget.establishment.tags.map((e) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 5),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                            color: kMainGreen,
+                          ),
+                          borderRadius: BorderRadius.circular(100),
+                          color: kMainGreen.withOpacity(0.1)),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        child: Text(
+                          e.value,
+                          style: kBold14.copyWith(
+                            color: kMainGreen,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              }).toList(),
+                  );
+                }).toList(),
+              ),
             )
           ],
         ),
