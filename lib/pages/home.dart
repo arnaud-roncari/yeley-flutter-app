@@ -1075,34 +1075,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /// TODO Mise en productio, iOS -> documents légaux / site support
-  /// TODO Mise en production android -> vérification identité / documents légaux / site support / tests fermés (20 testeurs) pendant 14 jours
+  /// TODO Mise en productio, iOS -> politique de confidentialité
+  /// TODO Mise en production android -> vérification identité / documents légaux / tests fermés (20 testeurs) pendant 14 jours
   /// Vérifier la DB avant de soumettre
   /// Mettre les documents légaux sur MinIO
 
   /// TODO plus tard, changer les info du compte
   /// Android (téléphone)
   /// iOS (téléphone, info perso)
-
-  /// mdp apple: J5L9Z2Y^YX*TYXjiarLcnnDwZj*Kpc@
-  /// mdp cloudflare: genzot-dexta1-cynFod
-  /// mdp mongo: rojwe1-jerpot-vuTron
-  /// mdp ovh: J5L9Z2Y^YX*TYXjiarLcnnDwZj*Kpc@
-  /// mdp vps: wPqBksp9n7xm
-  /// user vps: ubuntu
-  /// ip vps: 37.187.45.202
-  /// mot de passe gmail Yyeley245@!
-  ///
-  /// Mobile apple app SKU: fb7516b3-5aa4-4547-86cd-d8208e459990
-  ///
-  /// pour android=
-  /// storePassword=6aBc3bpUU^H3kmvo2xnnMpa*sjxv#sc
-  /// keyPassword=6aBc3bpUU^H3kmvo2xnnMpa*sjxv#sc
-  /// envoyer la keystore par mail
-
-  /// Remove la connection de ma clés ssh
-  /// Mette le code sur un github au nom de l'email
-  /// Update l(env pour retrier les donnée sensible (url de db))
 
   @override
   Widget build(BuildContext context) {
