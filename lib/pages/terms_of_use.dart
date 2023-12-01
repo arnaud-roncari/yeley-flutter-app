@@ -8,10 +8,11 @@ class TermsOfUsePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: kScaffoldBackground,
-        body: Column(
+    return Scaffold(
+      backgroundColor: kScaffoldBackground,
+      body: Padding(
+        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+        child: Column(
           children: [
             SizedBox(
               height: 60,

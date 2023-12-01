@@ -19,131 +19,137 @@ class _AddressFormPageState extends State<AddressFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: kScaffoldBackground,
-        body: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              SizedBox(
-                height: 60,
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(
-                        Icons.arrow_back_ios_new,
-                        color: kMainGreen,
-                      ),
-                    ),
-                    const SizedBox(width: 30),
-                    const Text(
-                      'Mon adresse',
-                      style: kBold18,
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
-                          hintText: 'Code postal',
-                          hintStyle: kRegular16,
-                        ),
-                        controller: _postalCodeController,
-                        validator: Validator.isNotEmpty,
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      flex: 2,
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
-                          hintText: 'Ville',
-                          hintStyle: kRegular16,
-                        ),
-                        controller: _cityController,
-                        validator: Validator.isNotEmpty,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 15),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
-                    hintText: 'Voie',
-                    hintStyle: kRegular16,
-                  ),
-                  controller: _addressController,
-                  validator: Validator.isNotEmpty,
-                ),
-              ),
-              const Spacer(),
-              context.watch<UsersProvider>().isSettingAddress
-                  ? const Center(
-                      child: CircularProgressIndicator(
-                      color: kMainGreen,
-                    ))
-                  : Column(
+    return Container(
+      color: kScaffoldBackground,
+      child: SafeArea(
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          backgroundColor: kScaffoldBackground,
+          body: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 7.5),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 60,
+                    child: Row(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: SizedBox(
-                            height: 50,
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(backgroundColor: kMainBlue, shape: const StadiumBorder()),
-                              onPressed: () async {
-                                await context.read<UsersProvider>().getPhonePosition(context);
-                              },
-                              child: Text(
-                                "Ma position",
-                                style: kBold16.copyWith(color: Colors.white),
-                              ),
-                            ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: const Icon(
+                            Icons.arrow_back_ios_new,
+                            color: kMainGreen,
                           ),
                         ),
-                        const SizedBox(height: 15),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: SizedBox(
-                            height: 50,
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style:
-                                  ElevatedButton.styleFrom(backgroundColor: kMainGreen, shape: const StadiumBorder()),
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  await context.read<UsersProvider>().setAddress(
-                                        context,
-                                        _postalCodeController.text,
-                                        _cityController.text,
-                                        _addressController.text,
-                                      );
-                                }
-                              },
-                              child: Text("Valider", style: kBold16.copyWith(color: Colors.white)),
+                        const SizedBox(width: 30),
+                        const Text(
+                          'Mon adresse',
+                          style: kBold18,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+                              hintText: 'Code postal',
+                              hintStyle: kRegular16,
                             ),
+                            controller: _postalCodeController,
+                            validator: Validator.isNotEmpty,
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          flex: 2,
+                          child: TextFormField(
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+                              hintText: 'Ville',
+                              hintStyle: kRegular16,
+                            ),
+                            controller: _cityController,
+                            validator: Validator.isNotEmpty,
                           ),
                         ),
                       ],
                     ),
-              const SizedBox(height: 30),
-            ],
+                  ),
+                  const SizedBox(height: 15),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+                        hintText: 'Voie',
+                        hintStyle: kRegular16,
+                      ),
+                      controller: _addressController,
+                      validator: Validator.isNotEmpty,
+                    ),
+                  ),
+                  const Spacer(),
+                  context.watch<UsersProvider>().isSettingAddress
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                          color: kMainGreen,
+                        ))
+                      : Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 15),
+                              child: SizedBox(
+                                height: 50,
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: kMainBlue, shape: const StadiumBorder()),
+                                  onPressed: () async {
+                                    await context.read<UsersProvider>().getPhonePosition(context);
+                                  },
+                                  child: Text(
+                                    "Ma position",
+                                    style: kBold16.copyWith(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 15),
+                              child: SizedBox(
+                                height: 50,
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: kMainGreen, shape: const StadiumBorder()),
+                                  onPressed: () async {
+                                    if (_formKey.currentState!.validate()) {
+                                      await context.read<UsersProvider>().setAddress(
+                                            context,
+                                            _postalCodeController.text,
+                                            _cityController.text,
+                                            _addressController.text,
+                                          );
+                                    }
+                                  },
+                                  child: Text("Valider", style: kBold16.copyWith(color: Colors.white)),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

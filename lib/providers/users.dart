@@ -211,7 +211,17 @@ class UsersProvider extends ChangeNotifier {
     if (navigationIndex == BottomNavigation.home) {
       navigationIndex = BottomNavigation.favorites;
       notifyListeners();
-      await getNearbyFavoriteEstablishments(context);
+      await Future.wait([
+        getNearbyFavoriteRestaurants(context),
+        getNearbyFavoriteActivities(context),
+      ]);
+
+      /// Will mainly set the first time the user arrive on the favorite page.
+      /// Avoid some bug display
+      if (favoriteActivities!.isNotEmpty || favoriteRestaurants!.isNotEmpty) {
+        hasInitialyFavorites = true;
+        notifyListeners();
+      }
     } else {
       navigationIndex = BottomNavigation.home;
       notifyListeners();
@@ -248,7 +258,10 @@ class UsersProvider extends ChangeNotifier {
     if (navigationIndex == BottomNavigation.home) {
       await getNearbyEstablishments(context);
     } else {
-      await getNearbyFavoriteEstablishments(context);
+      await Future.wait([
+        getNearbyFavoriteRestaurants(context),
+        getNearbyFavoriteActivities(context),
+      ]);
     }
   }
 
@@ -335,7 +348,8 @@ class UsersProvider extends ChangeNotifier {
   }
 
   /// --- Favorites ---
-  bool isNearbyFavoriteLoading = false;
+  bool isNearbyFavoriteRestaurantsLoading = false;
+  bool isNearbyFavoriteActivitiesLoading = false;
 
   /// Selected tags
   List<Tag> favoriteSelectedRestaurantsTags = [];
@@ -348,10 +362,11 @@ class UsersProvider extends ChangeNotifier {
   bool hasInitialyFavorites = false;
 
   bool isFavoritesNull() {
-    return favoriteRestaurants == null && favoriteActivities == null;
+    return favoriteRestaurants == null || favoriteActivities == null;
   }
 
   bool isFavoritesEmpty() {
+    /// Mean that the favorites were already loaded once.
     if (hasInitialyFavorites) {
       return false;
     }
@@ -374,15 +389,19 @@ class UsersProvider extends ChangeNotifier {
       }
     }
     notifyListeners();
-    await getNearbyFavoriteEstablishments(context);
+    if (tag.type == EstablishmentType.restaurant) {
+      await getNearbyFavoriteRestaurants(context);
+    } else {
+      await getNearbyFavoriteActivities(context);
+    }
   }
 
-  Future<void> getNearbyFavoriteEstablishments(context) async {
+  Future<void> getNearbyFavoriteRestaurants(context) async {
     try {
       if (address == null) {
         return;
       }
-      isNearbyFavoriteLoading = true;
+      isNearbyFavoriteRestaurantsLoading = true;
       notifyListeners();
       favoriteRestaurants = await Api().getNearbyEstablishments(
         range,
@@ -391,6 +410,21 @@ class UsersProvider extends ChangeNotifier {
         favoriteSelectedRestaurantsTags,
         favorite: true,
       );
+    } catch (exception) {
+      await ExceptionHelper.handle(context: context, exception: exception);
+    } finally {
+      isNearbyFavoriteRestaurantsLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> getNearbyFavoriteActivities(context) async {
+    try {
+      if (address == null) {
+        return;
+      }
+      isNearbyFavoriteActivitiesLoading = true;
+      notifyListeners();
       favoriteActivities = await Api().getNearbyEstablishments(
         range,
         address!.coordinates,
@@ -398,15 +432,10 @@ class UsersProvider extends ChangeNotifier {
         favoriteSelectedActivitiesTags,
         favorite: true,
       );
-
-      /// Will mainly set the first time the user arrive on the favorite page.
-      if (favoriteActivities!.isNotEmpty || favoriteRestaurants!.isNotEmpty) {
-        hasInitialyFavorites = true;
-      }
     } catch (exception) {
       await ExceptionHelper.handle(context: context, exception: exception);
     } finally {
-      isNearbyFavoriteLoading = false;
+      isNearbyFavoriteActivitiesLoading = false;
       notifyListeners();
     }
   }

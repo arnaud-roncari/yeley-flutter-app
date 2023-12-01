@@ -228,11 +228,16 @@ class _EstablishmentPageState extends State<EstablishmentPage> {
     topPosition = topPosition * 0.35;
     topPosition = topPosition / 2;
 
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: kScaffoldBackground,
-        body: Stack(
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Padding(
+        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+        child: Stack(
           children: [
+            Container(
+              color: kScaffoldBackground,
+              width: double.infinity,
+            ),
             FractionallySizedBox(
               heightFactor: 0.35,
               child: Container(
@@ -310,6 +315,7 @@ class _EstablishmentPageState extends State<EstablishmentPage> {
                   const SizedBox(height: 15),
                   Expanded(
                     child: GridView.count(
+                      padding: EdgeInsets.zero,
                       // Create a grid with 2 columns. If you change the scrollDirection to
                       // horizontal, this produces 2 rows.
                       crossAxisCount: 2,

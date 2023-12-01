@@ -288,7 +288,10 @@ class _HomePageState extends State<HomePage> {
                   if (provider.navigationIndex == BottomNavigation.home) {
                     await provider.getNearbyEstablishments(context);
                   } else {
-                    await provider.getNearbyFavoriteEstablishments(context);
+                    await Future.wait([
+                      provider.getNearbyFavoriteRestaurants(context),
+                      provider.getNearbyFavoriteActivities(context),
+                    ]);
                   }
                 },
                 child: Padding(
@@ -464,6 +467,12 @@ class _HomePageState extends State<HomePage> {
 
     final List<Tag> selectedTags = context.read<UsersProvider>().selectedTags;
     final List<Widget> tagChips = [];
+
+    /// Left padding
+    tagChips.add(const SizedBox(
+      width: 15,
+    ));
+
     for (final Tag tag in usersProvider.displayedTags!) {
       // Due to front rebuild issues, the state cannot be save in the widget, but defined thanks to the provider.
       // When the state was in the widget, if you were switching from restaurants to activities, the restaurants selected tags
@@ -509,85 +518,97 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildNoEstablishmentFoundMessage() {
     return Expanded(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SvgPicture.asset("assets/no_establishments.svg"),
-          const SizedBox(height: 40),
-          const Text(
-            "Aucun établissement.",
-            style: kBold22,
-          ),
-          const SizedBox(height: 15),
-          Text(
-            "Vous n'avez aucun établissement autours de vous pour le moment.",
-            style: kRegular14.copyWith(color: Colors.grey),
-            textAlign: TextAlign.center,
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset("assets/no_establishments.svg"),
+            const SizedBox(height: 40),
+            const Text(
+              "Aucun établissement.",
+              style: kBold22,
+            ),
+            const SizedBox(height: 15),
+            Text(
+              "Vous n'avez aucun établissement autours de vous pour le moment.",
+              style: kRegular14.copyWith(color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildNoFavoritesMessage() {
     return Expanded(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SvgPicture.asset(
-            "assets/no_favorites.svg",
-          ),
-          const SizedBox(height: 40),
-          const Text(
-            "Aucun favoris.",
-            style: kBold22,
-          ),
-          const SizedBox(height: 15),
-          Text(
-            "Vous n'avez rien sur votre liste pour le moment.",
-            style: kRegular14.copyWith(color: Colors.grey),
-            textAlign: TextAlign.center,
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              "assets/no_favorites.svg",
+            ),
+            const SizedBox(height: 40),
+            const Text(
+              "Aucun favoris.",
+              style: kBold22,
+            ),
+            const SizedBox(height: 15),
+            Text(
+              "Vous n'avez rien sur votre liste pour le moment.",
+              style: kRegular14.copyWith(color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildAddressUndefinedMessage() {
     return Expanded(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset("assets/no_establishments.png"),
-          const SizedBox(height: 15),
-          const Text(
-            "Où êtes-vous ?",
-            style: kBold22,
-          ),
-          const SizedBox(height: 5),
-          Text(
-            "Remplissez votre adresse pour accéder aux établissements autour de vous !",
-            style: kRegular14.copyWith(color: Colors.grey),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () async {
-              await Navigator.pushNamed(context, '/address-form');
-              UsersProvider provider = context.read<UsersProvider>();
-              if (provider.navigationIndex == BottomNavigation.home) {
-                await provider.getNearbyEstablishments(context);
-              } else {
-                await provider.getNearbyFavoriteEstablishments(context);
-              }
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: kMainGreen, shape: const StadiumBorder()),
-            child: Text(
-              "Définir mon adresse",
-              style: kBold16.copyWith(color: Colors.white),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset("assets/no_establishments.png"),
+            const SizedBox(height: 15),
+            const Text(
+              "Où êtes-vous ?",
+              style: kBold22,
             ),
-          ),
-        ],
+            const SizedBox(height: 5),
+            Text(
+              "Remplissez votre adresse pour accéder aux établissements autour de vous !",
+              style: kRegular14.copyWith(color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                await Navigator.pushNamed(context, '/address-form');
+                UsersProvider provider = context.read<UsersProvider>();
+                if (provider.navigationIndex == BottomNavigation.home) {
+                  await provider.getNearbyEstablishments(context);
+                } else {
+                  await Future.wait([
+                    provider.getNearbyFavoriteRestaurants(context),
+                    provider.getNearbyFavoriteActivities(context),
+                  ]);
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: kMainGreen, shape: const StadiumBorder()),
+              child: Text(
+                "Définir mon adresse",
+                style: kBold16.copyWith(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -623,94 +644,97 @@ class _HomePageState extends State<HomePage> {
 
     /// Dislike and like button
     return Expanded(
-      child: Stack(children: [
-        ...establishmentCards,
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 20, top: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  height: 60,
-                  width: 60,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(100),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 3,
-                        blurRadius: 3,
-                        offset: const Offset(0, 0),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: Stack(children: [
+          ...establishmentCards,
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 20, top: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    height: 60,
+                    width: 60,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(100),
                       ),
-                    ],
-                  ),
-                  child: Material(
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(100),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 3,
+                          blurRadius: 3,
+                          offset: const Offset(0, 0),
+                        ),
+                      ],
                     ),
-                    child: InkWell(
+                    child: Material(
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(100),
+                      ),
+                      child: InkWell(
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(100),
+                          ),
+                          onTap: () async {
+                            await context.read<UsersProvider>().onCardSwiped(context, EstablishmentSwiped.disliked);
+                          },
+                          child: const Center(
+                            child: Text(
+                              "🥱",
+                              style: TextStyle(fontSize: 45),
+                            ),
+                          )),
+                    ),
+                  ),
+                  const SizedBox(width: 35),
+                  Container(
+                    height: 60,
+                    width: 60,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(100),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 3,
+                          blurRadius: 3,
+                          offset: const Offset(0, 0),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(100),
+                      ),
+                      child: InkWell(
                         borderRadius: const BorderRadius.all(
                           Radius.circular(100),
                         ),
                         onTap: () async {
-                          await context.read<UsersProvider>().onCardSwiped(context, EstablishmentSwiped.disliked);
+                          await context.read<UsersProvider>().onCardSwiped(context, EstablishmentSwiped.liked);
                         },
                         child: const Center(
                           child: Text(
-                            "🥱",
+                            "🤩",
                             style: TextStyle(fontSize: 45),
                           ),
-                        )),
-                  ),
-                ),
-                const SizedBox(width: 35),
-                Container(
-                  height: 60,
-                  width: 60,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(100),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 3,
-                        blurRadius: 3,
-                        offset: const Offset(0, 0),
-                      ),
-                    ],
-                  ),
-                  child: Material(
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(100),
-                    ),
-                    child: InkWell(
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(100),
-                      ),
-                      onTap: () async {
-                        await context.read<UsersProvider>().onCardSwiped(context, EstablishmentSwiped.liked);
-                      },
-                      child: const Center(
-                        child: Text(
-                          "🤩",
-                          style: TextStyle(fontSize: 45),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      ]),
+        ]),
+      ),
     );
   }
 
@@ -805,6 +829,14 @@ class _HomePageState extends State<HomePage> {
     final List<Widget> restaurantFavoriteTagChips = [];
     final List<Widget> activityFavoriteTagChips = [];
 
+    /// Left padding
+    restaurantFavoriteTagChips.add(const SizedBox(
+      width: 15,
+    ));
+    activityFavoriteTagChips.add(const SizedBox(
+      width: 15,
+    ));
+
     /// Restaurants tags
     for (final Tag tag in provider.restaurantsTags!) {
       bool isSelected = false;
@@ -869,9 +901,12 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Restaurants",
-              style: kBold22,
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              child: Text(
+                "Restaurants",
+                style: kBold22,
+              ),
             ),
             const SizedBox(height: 15),
             Align(
@@ -885,7 +920,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 15),
-            provider.isNearbyFavoriteLoading
+            provider.isNearbyFavoriteRestaurantsLoading
                 ? const Expanded(
                     child: Center(
                         child: CircularProgressIndicator(
@@ -898,7 +933,9 @@ class _HomePageState extends State<HomePage> {
                       scrollDirection: Axis.horizontal,
                       children: List.generate(provider.favoriteRestaurants!.length, (index) {
                         return Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: index == 0
+                              ? const EdgeInsets.only(top: 8, bottom: 8, right: 8, left: 15)
+                              : const EdgeInsets.all(8),
                           child: GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -969,9 +1006,12 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
             const SizedBox(height: 20),
-            const Text(
-              "Activités",
-              style: kBold22,
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              child: Text(
+                "Activités",
+                style: kBold22,
+              ),
             ),
             const SizedBox(height: 15),
             Align(
@@ -985,7 +1025,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 15),
-            provider.isNearbyFavoriteLoading
+            provider.isNearbyFavoriteActivitiesLoading
                 ? const Expanded(
                     child: Center(
                       child: CircularProgressIndicator(
@@ -997,9 +1037,12 @@ class _HomePageState extends State<HomePage> {
                     child: GridView.count(
                       crossAxisCount: 1,
                       scrollDirection: Axis.horizontal,
+                      padding: EdgeInsets.zero,
                       children: List.generate(provider.favoriteActivities!.length, (index) {
                         return Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: index == 0
+                              ? const EdgeInsets.only(top: 8, bottom: 8, right: 8, left: 15)
+                              : const EdgeInsets.all(8),
                           child: GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -1075,15 +1118,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /// TODO Mise en productio, iOS -> politique de confidentialité
-  /// TODO Mise en production android -> vérification identité / documents légaux / tests fermés (20 testeurs) pendant 14 jours
-  /// Vérifier la DB avant de soumettre
-  /// Mettre les documents légaux sur MinIO
-
-  /// TODO plus tard, changer les info du compte
-  /// Android (téléphone)
-  /// iOS (téléphone, info perso)
-
   @override
   Widget build(BuildContext context) {
     final UsersProvider userProvider = context.watch<UsersProvider>();
@@ -1091,13 +1125,63 @@ class _HomePageState extends State<HomePage> {
     final bool isAddressUndefined = userProvider.address == null;
 
     if (userProvider.navigationIndex == BottomNavigation.home) {
-      return SafeArea(
+      return Container(
+        color: kScaffoldBackground,
+        child: SafeArea(
+          child: Scaffold(
+            backgroundColor: kScaffoldBackground,
+            body: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 7.5),
+              child: Column(children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: _buildTopBar(),
+                ),
+                const SizedBox(height: 15),
+                _buildSearchBar(),
+                const SizedBox(height: 15),
+                isAddressUndefined
+                    ? _buildAddressUndefinedMessage()
+                    : Expanded(
+                        child: Column(
+                          children: [
+                            _buildTags(),
+                            const SizedBox(height: 15),
+                            userProvider.displayedEstablishments == null || userProvider.isNearbyEstablishmentsLoading
+                                ? const Expanded(
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: kMainGreen,
+                                      ),
+                                    ),
+                                  )
+                                : userProvider.displayedEstablishments!.isEmpty
+                                    ? _buildNoEstablishmentFoundMessage()
+                                    : _buildEstablishmentCards(),
+                          ],
+                        ),
+                      ),
+                const SizedBox(height: 15),
+                _buildBottomNavigationBar()
+              ]),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      color: kScaffoldBackground,
+      child: SafeArea(
         child: Scaffold(
           backgroundColor: kScaffoldBackground,
           body: Padding(
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.symmetric(vertical: 7.5),
             child: Column(children: [
-              _buildTopBar(),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: _buildTopBar(),
+              ),
               const SizedBox(height: 15),
               _buildSearchBar(),
               const SizedBox(height: 15),
@@ -1106,9 +1190,7 @@ class _HomePageState extends State<HomePage> {
                   : Expanded(
                       child: Column(
                         children: [
-                          _buildTags(),
-                          const SizedBox(height: 15),
-                          userProvider.displayedEstablishments == null || userProvider.isNearbyEstablishmentsLoading
+                          userProvider.isFavoritesNull()
                               ? const Expanded(
                                   child: Center(
                                     child: CircularProgressIndicator(
@@ -1116,9 +1198,9 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                 )
-                              : userProvider.displayedEstablishments!.isEmpty
-                                  ? _buildNoEstablishmentFoundMessage()
-                                  : _buildEstablishmentCards(),
+                              : userProvider.isFavoritesEmpty()
+                                  ? _buildNoFavoritesMessage()
+                                  : _buildFavoriteCards()
                         ],
                       ),
                     ),
@@ -1126,42 +1208,6 @@ class _HomePageState extends State<HomePage> {
               _buildBottomNavigationBar()
             ]),
           ),
-        ),
-      );
-    }
-
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: kScaffoldBackground,
-        body: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Column(children: [
-            _buildTopBar(),
-            const SizedBox(height: 15),
-            _buildSearchBar(),
-            const SizedBox(height: 20),
-            isAddressUndefined
-                ? _buildAddressUndefinedMessage()
-                : Expanded(
-                    child: Column(
-                      children: [
-                        userProvider.isFavoritesNull()
-                            ? const Expanded(
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    color: kMainGreen,
-                                  ),
-                                ),
-                              )
-                            : userProvider.isFavoritesEmpty()
-                                ? _buildNoFavoritesMessage()
-                                : _buildFavoriteCards()
-                      ],
-                    ),
-                  ),
-            const SizedBox(height: 15),
-            _buildBottomNavigationBar()
-          ]),
         ),
       ),
     );

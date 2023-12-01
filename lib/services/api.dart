@@ -23,7 +23,7 @@ class Api {
       },
       body: jsonEncode(
         {
-          "email": email,
+          "email": email.toLowerCase(),
           "password": password,
         },
       ),
@@ -46,7 +46,7 @@ class Api {
       },
       body: jsonEncode(
         {
-          "email": email,
+          "email": email.toLowerCase(),
           "password": password,
         },
       ),

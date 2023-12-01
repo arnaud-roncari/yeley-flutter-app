@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-const String kApiUrl = kReleaseMode ? 'https://DNS.COM' : 'http://localhost:3000';
+const String kApiUrl = kReleaseMode ? 'https://api.yeley.fr' : 'https://api.yeley.fr';
 
 enum EstablishmentType { restaurant, activity }
 
