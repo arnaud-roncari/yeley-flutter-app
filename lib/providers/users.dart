@@ -102,7 +102,6 @@ class UsersProvider extends ChangeNotifier {
     BuildContext context,
     String postalCode,
     String city,
-    String address,
   ) async {
     try {
       isSettingAddress = true;
@@ -116,8 +115,8 @@ class UsersProvider extends ChangeNotifier {
       }
 
       final List<double> coordinates = [locations.first.longitude, locations.first.latitude];
-      this.address = Address(
-        address: address,
+      address = Address(
+        address: "",
         city: city,
         postalCode: postalCode,
         fullAddress: fullAddress,
@@ -125,7 +124,7 @@ class UsersProvider extends ChangeNotifier {
       );
 
       // User address is saved stringify and saved in local storage.
-      await LocalStorageService().setString("address", jsonEncode(this.address!.toJson()));
+      await LocalStorageService().setString("address", jsonEncode(address!.toJson()));
 
       Navigator.pop(context);
     } catch (e) {
@@ -211,6 +210,11 @@ class UsersProvider extends ChangeNotifier {
     if (navigationIndex == BottomNavigation.home) {
       navigationIndex = BottomNavigation.favorites;
       notifyListeners();
+
+      if (address == null) {
+        return;
+      }
+
       await Future.wait([
         getNearbyFavoriteRestaurants(context),
         getNearbyFavoriteActivities(context),
@@ -283,7 +287,35 @@ class UsersProvider extends ChangeNotifier {
   /// Used for the front card animation
   Size screenSize = Size.zero;
 
-  Future<void> onCardSwiped(
+  double angle = 0;
+
+  void onUpdatePosition(DragUpdateDetails details) {
+    frontCardPosition += details.delta;
+
+    double x = frontCardPosition.dx;
+    angle = 45 * x / screenSize.width;
+
+    notifyListeners();
+  }
+
+  void onEndPosition(BuildContext context, DragEndDetails details) async {
+    isCardSwiped = true;
+    if (frontCardPosition.dx >= 100) {
+      angle = 20;
+      onCardButtonSwiped(context, EstablishmentSwiped.liked);
+    } else if (frontCardPosition.dx <= -100) {
+      angle = -20;
+      onCardButtonSwiped(context, EstablishmentSwiped.disliked);
+    } else {
+      frontCardPosition = Offset.zero;
+      angle = 0;
+      notifyListeners();
+      await Future.delayed(const Duration(milliseconds: 200));
+      isCardSwiped = false;
+    }
+  }
+
+  Future<void> onCardButtonSwiped(
     BuildContext context,
     EstablishmentSwiped status,
   ) async {
@@ -310,6 +342,7 @@ class UsersProvider extends ChangeNotifier {
     /// Reset the position for the next card.
     frontCardPosition = Offset.zero;
     isCardSwiped = false;
+    angle = 0;
     notifyListeners();
   }
 

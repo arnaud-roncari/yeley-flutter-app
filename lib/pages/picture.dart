@@ -4,14 +4,38 @@ import 'package:yeley_frontend/commons/constants.dart';
 import 'package:yeley_frontend/services/api.dart';
 
 class PicturePage extends StatefulWidget {
-  final String picturePath;
-  const PicturePage({super.key, required this.picturePath});
+  final List<String> picturePaths;
+  final int index;
+  const PicturePage({super.key, required this.picturePaths, required this.index});
 
   @override
   State<PicturePage> createState() => _PicturePageState();
 }
 
 class _PicturePageState extends State<PicturePage> {
+  late PageController controller;
+  late List<Widget> pictures = [];
+
+  @override
+  void initState() {
+    controller = PageController(initialPage: widget.index);
+
+    for (String picturePath in widget.picturePaths) {
+      pictures.add(
+        Center(
+          child: CachedNetworkImage(
+            fit: BoxFit.contain,
+            imageUrl: "$kApiUrl/establishments/picture/$picturePath",
+            httpHeaders: {
+              'Authorization': 'Bearer ${Api.jwt}',
+            },
+          ),
+        ),
+      );
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -19,14 +43,9 @@ class _PicturePageState extends State<PicturePage> {
         backgroundColor: Colors.black,
         body: Stack(
           children: [
-            Center(
-              child: CachedNetworkImage(
-                fit: BoxFit.contain,
-                imageUrl: "$kApiUrl/establishments/picture/${widget.picturePath}",
-                httpHeaders: {
-                  'Authorization': 'Bearer ${Api.jwt}',
-                },
-              ),
+            PageView(
+              controller: controller,
+              children: pictures,
             ),
             SizedBox(
               height: 60,

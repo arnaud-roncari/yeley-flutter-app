@@ -14,7 +14,6 @@ class AddressFormPage extends StatefulWidget {
 class _AddressFormPageState extends State<AddressFormPage> {
   final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -83,19 +82,6 @@ class _AddressFormPageState extends State<AddressFormPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 15),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: TextFormField(
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
-                        hintText: 'Voie',
-                        hintStyle: kRegular16,
-                      ),
-                      controller: _addressController,
-                      validator: Validator.isNotEmpty,
-                    ),
-                  ),
                   const Spacer(),
                   context.watch<UsersProvider>().isSettingAddress
                       ? const Center(
@@ -137,7 +123,6 @@ class _AddressFormPageState extends State<AddressFormPage> {
                                             context,
                                             _postalCodeController.text,
                                             _cityController.text,
-                                            _addressController.text,
                                           );
                                     }
                                   },

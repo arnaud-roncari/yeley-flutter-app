@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -289,6 +291,7 @@ class _HomePageState extends State<HomePage> {
                     await provider.getNearbyEstablishments(context);
                   } else {
                     await Future.wait([
+                      provider.getNearbyEstablishments(context),
                       provider.getNearbyFavoriteRestaurants(context),
                       provider.getNearbyFavoriteActivities(context),
                     ]);
@@ -313,7 +316,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const Spacer(),
                       Text(
-                        userProvider.address == null ? "" : userProvider.address!.fullAddress,
+                        userProvider.address == null ? "" : userProvider.address!.city,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: kRegular16.copyWith(color: Colors.black),
@@ -596,6 +599,7 @@ class _HomePageState extends State<HomePage> {
                   await provider.getNearbyEstablishments(context);
                 } else {
                   await Future.wait([
+                    provider.getNearbyEstablishments(context),
                     provider.getNearbyFavoriteRestaurants(context),
                     provider.getNearbyFavoriteActivities(context),
                   ]);
@@ -622,20 +626,40 @@ class _HomePageState extends State<HomePage> {
     /// We have to loop reversely, so that the first element of the list well be displayed first, since we are using Stack widget bellow.
     /// Without the reverse loop, the first element would be the first one draw (so the last one visible, since other elements will be display on the top of it).
     ///
-    /// The ternary limit the build element to 5 maximum, to avoid performances issues.
-    for (int i = establishments.length < 5 ? establishments.length - 1 : 4; i >= 0; i--) {
+    /// The ternary limit the build element to 2 maximum, to avoid performances issues.
+    for (int i = establishments.length < 2 ? establishments.length - 1 : 1; i >= 0; i--) {
       if (i == 0) {
-        final Duration milliseconds = Duration(milliseconds: userProvider.isCardSwiped == true ? 400 : 0);
+        final Duration milliseconds = Duration(milliseconds: userProvider.isCardSwiped ? 400 : 0);
         final Offset position = userProvider.frontCardPosition;
 
         establishmentCards.add(
-          AnimatedContainer(
-            decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(20)),
-            duration: milliseconds,
-            curve: Curves.easeInOut,
-            transform: Matrix4.identity()..translate(position.dx, position.dy),
-            child: EstablishmentCard(key: UniqueKey(), establishment: establishments[i]),
-          ),
+          LayoutBuilder(builder: (context, constraint) {
+            final Offset center = constraint.smallest.center(Offset.zero);
+            final double angle = userProvider.angle * pi / 180;
+            final Matrix4 rotatedMatrix = Matrix4.identity()
+              ..translate(center.dx, center.dy)
+              ..rotateZ(angle)
+              ..translate(-center.dx, -center.dy);
+
+            return AnimatedContainer(
+              decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(20)),
+              duration: milliseconds,
+              curve: Curves.easeInOut,
+              transform: rotatedMatrix..translate(position.dx, position.dy),
+              child: GestureDetector(
+                onPanUpdate: (details) {
+                  userProvider.onUpdatePosition(details);
+                },
+                onPanEnd: (details) {
+                  userProvider.onEndPosition(context, details);
+                },
+                child: EstablishmentCard(
+                  key: UniqueKey(),
+                  establishment: establishments[i],
+                ),
+              ),
+            );
+          }),
         );
       } else {
         establishmentCards.add(EstablishmentCard(key: UniqueKey(), establishment: establishments[i]));
@@ -681,7 +705,9 @@ class _HomePageState extends State<HomePage> {
                             Radius.circular(100),
                           ),
                           onTap: () async {
-                            await context.read<UsersProvider>().onCardSwiped(context, EstablishmentSwiped.disliked);
+                            await context
+                                .read<UsersProvider>()
+                                .onCardButtonSwiped(context, EstablishmentSwiped.disliked);
                           },
                           child: const Center(
                             child: Text(
@@ -718,7 +744,7 @@ class _HomePageState extends State<HomePage> {
                           Radius.circular(100),
                         ),
                         onTap: () async {
-                          await context.read<UsersProvider>().onCardSwiped(context, EstablishmentSwiped.liked);
+                          await context.read<UsersProvider>().onCardButtonSwiped(context, EstablishmentSwiped.liked);
                         },
                         child: const Center(
                           child: Text(

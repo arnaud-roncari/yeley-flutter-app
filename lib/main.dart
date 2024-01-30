@@ -14,6 +14,9 @@ import 'package:yeley_frontend/services/local_storage.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  /// Define the status bar color to black.
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+
   /// Set the application oriention to portrait only.
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
