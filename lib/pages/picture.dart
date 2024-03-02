@@ -38,10 +38,10 @@ class _PicturePageState extends State<PicturePage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: Stack(
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Stack(
           children: [
             PageView(
               controller: controller,

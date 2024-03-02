@@ -102,12 +102,13 @@ class UsersProvider extends ChangeNotifier {
     BuildContext context,
     String postalCode,
     String city,
+    String street,
   ) async {
     try {
       isSettingAddress = true;
       notifyListeners();
 
-      final String fullAddress = "$address, $postalCode $city, France";
+      final String fullAddress = street.isEmpty ? "$postalCode $city, France" : "$street, $postalCode $city, France";
       List<Location> locations = await locationFromAddress(fullAddress);
 
       if (locations.isEmpty) {
@@ -116,7 +117,7 @@ class UsersProvider extends ChangeNotifier {
 
       final List<double> coordinates = [locations.first.longitude, locations.first.latitude];
       address = Address(
-        address: "",
+        address: street,
         city: city,
         postalCode: postalCode,
         fullAddress: fullAddress,

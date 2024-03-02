@@ -14,6 +14,7 @@ class AddressFormPage extends StatefulWidget {
 class _AddressFormPageState extends State<AddressFormPage> {
   final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _streetController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -59,7 +60,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
                           child: TextFormField(
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
-                              hintText: 'Code postal',
+                              hintText: 'Code postal*',
                               hintStyle: kRegular16,
                             ),
                             controller: _postalCodeController,
@@ -72,7 +73,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
                           child: TextFormField(
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
-                              hintText: 'Ville',
+                              hintText: 'Ville*',
                               hintStyle: kRegular16,
                             ),
                             controller: _cityController,
@@ -80,6 +81,18 @@ class _AddressFormPageState extends State<AddressFormPage> {
                           ),
                         ),
                       ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+                        hintText: 'Rue',
+                        hintStyle: kRegular16,
+                      ),
+                      controller: _streetController,
                     ),
                   ),
                   const Spacer(),
@@ -123,6 +136,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
                                             context,
                                             _postalCodeController.text,
                                             _cityController.text,
+                                            _streetController.text,
                                           );
                                     }
                                   },

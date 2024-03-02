@@ -316,7 +316,11 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const Spacer(),
                       Text(
-                        userProvider.address == null ? "" : userProvider.address!.city,
+                        userProvider.address == null
+                            ? ""
+                            : userProvider.address!.address.isEmpty
+                                ? userProvider.address!.city
+                                : "${userProvider.address!.address}, ${userProvider.address!.city}",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: kRegular16.copyWith(color: Colors.black),
